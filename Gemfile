@@ -8,6 +8,7 @@ gem 'haml'
 gem 'roadie'
 gem 'draper'
 gem 'capistrano', '~> 3.2.0'
+gem "net-ssh", "~> 2.7.0"
 
 group :test, :development do
   gem 'letter_opener'
