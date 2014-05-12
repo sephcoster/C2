@@ -4,42 +4,28 @@
 # is considered to be the first unless any hosts have the primary
 # property set.  Don't declare `role :all`, it's a meta role.
 
-role :app, %w{deploy@example.com}
-role :web, %w{deploy@example.com}
-role :db,  %w{deploy@example.com}
+set :branch, "production"
 
+set(:real_revision) { source.query_revision( revision ) { |cmd| capture(cmd) } }
+set :user, ENV['USER'] || 'ubuntu'
+set :web_user, "www-data"
+set :web_group, "www-data"
+set :deploy_to, "/projects/#{application}"
+set :rails_env, :production
 
-# Extended Server Syntax
-# ======================
-# This can be used to drop a more detailed server definition into the
-# server list. The second argument is a, or duck-types, Hash and is
-# used to set extended properties on the server.
+role :web, "ec2-54-185-133-124.us-west-2.compute.amazonaws.com"     # Your HTTP server, Apache/etc
+role :app, "ec2-54-185-133-124.us-west-2.compute.amazonaws.com"     # This may be the same as your `Web` server
+role :db,  "ec2-54-185-133-124.us-west-2.compute.amazonaws.com", :primary => true     # This is where Rails migrations will run
 
-server 'example.com', user: 'deploy', roles: %w{web app}, my_property: :my_value
+# before 'deploy:update_code', 'deploy:take_control'
+# before 'deploy:symlink_db', 'deploy:delete_rvmrc'
 
+namespace :deploy do
 
-# Custom SSH Options
-# ==================
-# You may pass any option but keep in mind that net/ssh understands a
-# limited set of options, consult[net/ssh documentation](http://net-ssh.github.io/net-ssh/classes/Net/SSH.html#method-c-start).
-#
-# Global options
-# --------------
-#  set :ssh_options, {
-#    keys: %w(/home/rlisowski/.ssh/id_rsa),
-#    forward_agent: false,
-#    auth_methods: %w(password)
-#  }
-#
-# And/or per server (overrides global)
-# ------------------------------------
-# server 'example.com',
-#   user: 'user_name',
-#   roles: %w{web app},
-#   ssh_options: {
-#     user: 'user_name', # overrides user setting above
-#     keys: %w(/home/user_name/.ssh/id_rsa),
-#     forward_agent: false,
-#     auth_methods: %w(publickey password)
-#     # password: 'please use keys'
-#   }
+  # task :relinquish_control, :roles => :web do
+  #   sudo "chown -R #{web_user}:#{web_group} #{deploy_to}/", :pty => true
+  #   sudo "chmod -R g+rx #{deploy_to}/", :pty => true
+  # end
+end
+
+# require './config/boot'
