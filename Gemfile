@@ -7,6 +7,7 @@ gem 'jbuilder', '~> 1.2'
 gem 'haml'
 gem 'roadie'
 gem 'draper'
+gem 'capistrano', '~>2.1'
 
 group :test, :development do
   gem 'letter_opener'
