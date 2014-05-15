@@ -1,25 +1,42 @@
-set :application, "set your application name here"
-set :repository,  "set your repository location here"
+require "bundler/capistrano"
 
-# set :scm, :git # You can set :scm explicitly or Capistrano will make an intelligent guess based on known version control directory names
-# Or: `accurev`, `bzr`, `cvs`, `darcs`, `git`, `mercurial`, `perforce`, `subversion` or `none`
+# set :whenever_command, "bundle exec whenever"
+# require "whenever/capistrano"
 
-role :web, "your web-server here"                          # Your HTTP server, Apache/etc
-role :app, "your app-server here"                          # This may be the same as your `Web` server
-role :db,  "your primary db-server here", :primary => true # This is where Rails migrations will run
-role :db,  "your slave db-server here"
+set :application, "c2"
+set :repository,  "https://github.com/18F/C2.git"
+set :branch, :master
+set :domain, '54.185.133.124'
+set :deploy_to, "/var/www/#{application}" # I like this location
+set :deploy_via, :remote_cache
+set :user, "ubuntu"
+set :keep_releases, 6
+set :scm, :git
+set :use_sudo, true
 
-# if you want to clean up old releases on each deploy uncomment this:
-# after "deploy:restart", "deploy:cleanup"
+default_run_options[:pty] = true
 
-# if you're still using the script/reaper helper you will need
-# these http://github.com/rails/irs_process_scripts
+role :app, domain
+role :web, domain
+role :db,  domain, :primary => true
 
-# If you are using Passenger mod_rails uncomment this:
-# namespace :deploy do
-#   task :start do ; end
-#   task :stop do ; end
-#   task :restart, :roles => :app, :except => { :no_release => true } do
-#     run "#{try_sudo} touch #{File.join(current_path,'tmp','restart.txt')}"
-#   end
-# end
+namespace :deploy do
+  task :start do ; end
+  task :stop do ; end
+  task :restart, :roles => :app, :except => { :no_release => true } do
+    run "#{try_sudo} touch #{File.join(current_path,'tmp','restart.txt')}"
+  end
+
+  desc "Add config dir to shared folder"
+  task :add_shared_config do
+    run "mkdir #{deploy_to}/shared/config"
+  end
+
+  desc "Symlink configs"
+  task :symlink_configs, :roles => :app do
+    run "ln -nfs #{deploy_to}/shared/config/*.yml #{release_path}/config/"
+  end
+end
+
+after 'bundle:install', 'deploy:symlink_configs'
+after 'deploy:setup', 'deploy:add_shared_config'
