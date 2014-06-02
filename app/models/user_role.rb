@@ -4,6 +4,6 @@ class UserRole < ActiveRecord::Base
 
   validates_presence_of :user_id
   validates_presence_of :approval_group_id
-  validates_presence_of :role #TODO: restrict to: requester, approver, observer
+  validates_presence_of :role #TODO: restrict to: requester, approver, observer; Limit requester to only one at this time;
 
 end
