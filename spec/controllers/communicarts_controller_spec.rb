@@ -288,7 +288,7 @@ describe CommunicartsController do
         approval1 = Approval.create(user_id: user1.id, cart_id: rejected_cart.id)
         approval2 = Approval.create(user_id: user2.id, cart_id: rejected_cart.id)
         requester = FactoryGirl.create(:user, email_address: 'rejection-requester@some-dot-gov.gov')
-        rejection_approval_group.user_roles << UserRole.create!(user_id: user1.id, approval_group_id: approval_group.id, role: 'requester')
+        UserRole.create!(user_id: user1.id, approval_group_id: rejection_approval_group.id, role: 'requester')
         rejected_cart.approvals << approval1
         rejected_cart.approvals << approval2
         rejected_cart.save
