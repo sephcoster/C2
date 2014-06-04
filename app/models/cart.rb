@@ -77,7 +77,10 @@ class Cart < ActiveRecord::Base
 
     name = !params['cartName'].blank? ? params['cartName'] : params['cartNumber']
 
-    existing_pending_cart =  Cart.find_by(name: name, status: 'pending')
+    if existing_pending_cart =  Cart.find_by(name: name, status: 'pending')
+      existing_pending_cart.approvals.map(&:destroy)
+    end
+
     if existing_pending_cart.blank?
 
       cart = Cart.new(name: name, status: 'pending', external_id: params['cartNumber'])
