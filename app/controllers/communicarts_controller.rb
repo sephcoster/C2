@@ -30,7 +30,7 @@ class CommunicartsController < ApplicationController
       #No approval group is indicated, so create an approval with the user that was passed in.
       #TODO: require a user to be sent if approval group isn't indicated
       approval_user = User.find_or_create_by(email_address: params["email"])
-      Approval.create!(user_id: approval_user.id, cart_id: cart.id)
+      Approval.create!(user_id: approval_user.id, cart_id: cart.id, role: 'approver')
       CommunicartMailer.cart_notification_email(params["email"], params, cart).deliver
     end
 

@@ -89,7 +89,7 @@ class Cart < ActiveRecord::Base
       #REFACTOR
       if last_rejected_cart = Cart.where(name: name, status: 'rejected').last
         last_rejected_cart.approvals.each do | approval |
-          new_approval = Approval.create!(user_id: approval.user_id)
+          new_approval = Approval.create!(user_id: approval.user_id, role: approval.role)
           cart.approvals << new_approval
           CommunicartMailer.cart_notification_email(new_approval.user.email_address, params, cart).deliver
         end
